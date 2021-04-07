@@ -1,7 +1,7 @@
 type Lexer {
   src: str
   idx: i32
-  len: i32 // str does not implement .len filed yet
+  len: i32 // str does not implement .len field yet
 }
 
 type TextPos { start: i32 end: i32 }
