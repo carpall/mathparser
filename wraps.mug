@@ -1,0 +1,7 @@
+func printf(text: str)
+
+func puts(text: str)
+
+func strlen(text: str): i64
+
+func clock(): i64

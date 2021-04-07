@@ -1,0 +1,143 @@
+func `-`(left: TextPos, right: i32): TextPos {
+	return TextPos(left.start-right, left.end-right)
+}
+
+func (self: TokenKind) to_str(): str {
+	return
+	  if   self == TokenKind.Identifier { "Identifier" }
+		elif self == TokenKind.Digit      { "Digit"      }
+		elif self == TokenKind.BAD        { "BAD"        }
+		elif self == TokenKind.EOF        { "EOF"        }
+		elif self == TokenKind.Plus       { "Plus"       }
+		elif self == TokenKind.Minus      { "Minus"      }
+		elif self == TokenKind.Star       { "Star"       }
+		elif self == TokenKind.Slash      { "Slash"      }
+		else                              { "UnknownTok" }
+}
+
+func (self: chr) is_allowed_symbol(): u1 {
+	return self == '+' | self == '-' | self == '*' | self == '/'
+}
+
+func (self: chr) is_upper(): u1 {
+	return (self as u8) >= ('A' as u8) & (self as u8) <= ('Z' as u8)
+}
+
+func (self: chr) is_lower(): u1 {
+	return (self as u8) >= ('a' as u8) & (self as u8) <= ('z' as u8)
+}
+
+func (self: chr) is_ident_char(): u1 {
+	return self.is_lower() | self.is_upper() | self == '_'
+}
+
+func (self: chr) is_num_char(): u1 {
+	return (self as u8) >= ('0' as u8) & (self as u8) <= ('9' as u8)
+}
+
+func (self: chr) is_ident_num_char(): u1 {
+	return self.is_ident_char() | self.is_num_char()
+}
+
+func (self: chr) to_str(): str {
+	return new [chr] { self, '\0' } as str
+}
+
+func (self: chr) recognize_symbol(): TokenKind {
+	return (self as u8) as TokenKind
+}
+
+func (self: chr) is_control(): u1 {
+	return self == ' ' | self == '\r' | self == '\t'
+}
+
+func (this: *Lexer) reached_eof(): u1 {
+	return (*this).idx >= (*this).len
+}
+
+func (this: *Lexer) current(): chr {
+	return (*this).src[(*this).idx]
+}
+
+func (this: *Lexer) take_ident(start: i32, end: i32): str {
+	const i = start
+	const len = end-start
+	var result = new [chr, len] {}
+
+	while start < end {
+		result[start - i] = (*this).src[start]
+		start++
+	}
+
+	result[len] = '\0'
+	return result as str
+}
+
+func (this: *Lexer) collect_ident(): Token {
+	const start = (*this).idx
+
+	while true {
+		if this.reached_eof() | !this.current().is_ident_num_char() { break }
+		this.advance()
+	}
+
+	const end = (*this).idx
+
+	return Token(TokenKind.Identifier, this.take_ident(start, end), TextPos(start, end))
+}
+
+func (this: *Lexer) collect_num(): Token {
+	const start = (*this).idx
+
+	while true {
+		if this.reached_eof() | !this.current().is_num_char() { break }
+		this.advance()
+	}
+	
+	const end = (*this).idx
+
+	return Token(TokenKind.Digit, this.take_ident(start, end), TextPos(start, end))
+}
+
+func (this: *Lexer) collect_symbol(): Token {
+	const cur = this.current()
+	return Token(cur.recognize_symbol(), cur.to_str(), this.current_pos())
+}
+
+func (this: *Lexer) advance() {
+	(*this).idx++
+}
+
+func (this: *Lexer) skip_whitespace() {
+	while !this.reached_eof() & this.current().is_control() { this.advance() }
+}
+
+func (this: *Lexer) current_pos(): TextPos {
+	const idx = (*this).idx
+	return TextPos(idx, idx+1)
+}
+
+func (this: *Lexer) next_tok(): Token {
+	// eating whitespace
+	this.skip_whitespace()
+
+	// checking for the end of the file
+	if this.reached_eof() { return TokenEOF(this.current_pos() - 1) }
+
+	const cur = this.current()
+	var result: Token
+
+	if cur.is_allowed_symbol() {
+		result = this.collect_symbol()
+	} elif cur.is_ident_char() {
+		result = this.collect_ident()
+	} elif cur.is_num_char() {
+		result = this.collect_num()
+	} else {
+		result = TokenBAD(this.current_pos())
+	}
+
+	this.advance()
+
+	return result
+}

@@ -1,0 +1,38 @@
+/*
+  todo:
+	  [ ] add a to_str method for TextPos and add a print for it in test1
+*/
+
+// this could be a library so the main should be generated only when the user wants
+when test_lexer {
+	func test1(test: str, len: i32) {
+		var lexer = Lexer(test, len)
+		
+		for i: i32, !(&lexer).reached_eof(), i++ {
+			const token = (&lexer).next_tok()
+			printf(token.kind.to_str())
+			printf(" ")
+			puts(token.value)
+		}
+	}
+
+	func test2(test: str, len: i32): i32 {
+		var lexer = Lexer(test, len)
+		
+		const start = clock() as i32
+		for i: i32, !(&lexer).reached_eof(), i++ {
+			(&lexer).next_tok()
+		}
+		return (clock() as i32) - star
+	}
+
+	func main() {
+		const test = "ciao come _1 10 + - / *"
+		const len = strlen(test) as i32
+		
+		// test if works
+		when test_toks { test1(test, len) }
+		// test performance
+		when test_perf { test2(test, len) }
+	}
+}

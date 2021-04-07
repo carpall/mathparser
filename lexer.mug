@@ -1,0 +1,39 @@
+type Lexer {
+	src: str
+	idx: i32
+	len: i32 // str does not implement .len filed yet
+}
+
+type TextPos { start: i32 end: i32 }
+
+type Token { kind: TokenKind value: str pos: TextPos }
+
+enum TokenKind: u8 {
+	Identifier Digit
+	BAD EOF
+	Plus: 43 Minus: 45 Star: 42 Slash: 47
+}
+
+func Lexer(src: str, len: i32): Lexer {
+	return new Lexer { src: src, len: len }
+}
+
+func TextPos(start: i32, end: i32): TextPos {
+	return new TextPos { start: start, end: end }
+}
+
+func Token(kind: TokenKind, value: str, pos: TextPos): Token {
+	return new Token { kind: kind, value: value, pos: pos }
+}
+
+func Token(kind: TokenKind, pos: TextPos): Token {
+	return new Token { kind: kind, pos: pos }
+}
+
+func TokenEOF(pos: TextPos): Token {
+	return Token(TokenKind.EOF, pos)
+}
+
+func TokenBAD(pos: TextPos): Token {
+	return Token(TokenKind.BAD, pos)
+}
