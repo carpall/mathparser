@@ -1,0 +1,38 @@
+type Parser {
+	lex: Lexer
+	idx: i32
+	bck: Token
+	cur: Token
+}
+
+func Parser(text: str, len: str): Parser {
+	return new Parser { lex: Lexer(text, len) }
+}
+
+// set the back token of the parser to the current, and the current to the next
+func (this: *Parser) fetch_tok(): Token {
+	(*this).bck = (*this).cur
+	return (*this).cur = (&(*this).lex).next_token()
+}
+
+// returns the token that the parser is looking to
+func (this: *Parser) cur(): Token {
+	return (*this).cur
+}
+
+// returns true whether the current token's kind is equals to `kind`
+func (this: *Parser) match(kind: TokenKind): bool {
+	return this.cur().kind == kind 
+}
+
+func (this: *Parser) match_val() {
+	return this.match(TokenKind.Digit) | this.match(TokenKind.Identifier)
+}
+
+func (this: *Parser) parse(): ParseErr!Node {
+	if this.match_val(&val) {
+		return 
+	}
+	
+	return ParseErr.CouldNotParse
+}

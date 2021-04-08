@@ -1,0 +1,1 @@
+enum ParseErr: u8 { CouldNotParse }

@@ -1,22 +1,19 @@
-func `-`(left: TextPos, right: i32): TextPos {
-  return TextPos(left.start-right, left.end-right)
+type Lexer {
+  src: str
+  idx: i32
+  len: i32 // str does not implement .len field yet
 }
 
-func (self: TokenKind) to_str(): str {
-  return
-    if   self == TokenKind.Identifier { "Identifier" }
-    elif self == TokenKind.Digit      { "Digit"      }
-    elif self == TokenKind.BAD        { "BAD"        }
-    elif self == TokenKind.EOF        { "EOF"        }
-    elif self == TokenKind.Plus       { "Plus"       }
-    elif self == TokenKind.Minus      { "Minus"      }
-    elif self == TokenKind.Star       { "Star"       }
-    elif self == TokenKind.Slash      { "Slash"      }
-    else                              { "UnknownTok" }
+func Lexer(src: str, len: i32): Lexer {
+  return new Lexer { src: src, len: len }
 }
+
+// implementation
 
 func (self: chr) is_allowed_symbol(): u1 {
-  return self == '+' | self == '-' | self == '*' | self == '/'
+  return
+    self == '+' | self == '-' | self == '*' | self == '/' |
+    self == '(' | self == ')'
 }
 
 func (self: chr) is_upper(): u1 {

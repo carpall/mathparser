@@ -1,0 +1,49 @@
+type TextPos { start: i32 end: i32 }
+
+type Token { kind: TokenKind value: str pos: TextPos }
+
+enum TokenKind: u8 {
+  Identifier Digit
+  BAD EOF
+  Plus: 43 Minus: 45 Star: 42 Slash: 47
+  Open: 40 Close: 41
+}
+
+func TextPos(start: i32, end: i32): TextPos {
+  return new TextPos { start: start, end: end }
+}
+
+func Token(kind: TokenKind, value: str, pos: TextPos): Token {
+  return new Token { kind: kind, value: value, pos: pos }
+}
+
+func Token(kind: TokenKind, pos: TextPos): Token {
+  return new Token { kind: kind, pos: pos }
+}
+
+func TokenEOF(pos: TextPos): Token {
+  return Token(TokenKind.EOF, pos)
+}
+
+func TokenBAD(pos: TextPos): Token {
+  return Token(TokenKind.BAD, pos)
+}
+
+func `-`(left: TextPos, right: i32): TextPos {
+  return TextPos(left.start-right, left.end-right)
+}
+
+func (self: TokenKind) to_str(): str {
+  return
+    if   self == TokenKind.Identifier { "Identifier" }
+    elif self == TokenKind.Digit      { "Digit"      }
+    elif self == TokenKind.BAD        { "BAD"        }
+    elif self == TokenKind.EOF        { "EOF"        }
+    elif self == TokenKind.Plus       { "Plus"       }
+    elif self == TokenKind.Minus      { "Minus"      }
+    elif self == TokenKind.Star       { "Star"       }
+    elif self == TokenKind.Slash      { "Slash"      }
+    elif self == TokenKind.Open       { "Open"       }
+    elif self == TokenKind.Close      { "Close"      }
+    else                              { "UnknownTok" }
+}

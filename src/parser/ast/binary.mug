@@ -1,0 +1,9 @@
+type BinaryNode {
+	left: Node
+	right: Node
+	op: TokenKind
+}
+
+func BinaryNode(left: Node, right: Node, op: TokenKind): BinaryNode {
+	return new BinaryNode { left: left, right: right, op: op }
+}

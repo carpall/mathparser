@@ -1,0 +1,16 @@
+func print_errors(errors: DiagnosticBag) {
+	puts("parse: fail")
+
+	for i: i32, i < errors.len, i++ {
+		puts(errors)
+	}
+}
+
+func main() {
+	const test = "1 + 2"
+	const len = strlen(test)
+	var parser = Parser(test, len)
+	(&parser).parse() catch { print_errors(parser.bag) return }
+
+	puts("parse: ok")
+}
