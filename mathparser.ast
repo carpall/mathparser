@@ -1,0 +1,15 @@
+{
+  "NodeKind": "Namespace",
+  "Members": {
+    "NodeKind": "NodeBuilder",
+    "Nodes": [
+      null
+    ],
+    "Length": 1
+  },
+  "Name": {
+    "NodeKind": "Literal",
+    "Kind": "Identifier",
+    "Value": "null"
+  }
+}
