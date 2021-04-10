@@ -1,1 +1,1 @@
-enum ParseErr: u8 { CouldNotParse }
+enum ParseErr: err { CouldNotParse: 1 }

@@ -3,10 +3,10 @@ type TextPos { start: i32 end: i32 }
 type Token { kind: TokenKind value: str pos: TextPos }
 
 enum TokenKind: u8 {
-  Identifier Digit
-  BAD EOF
-  Plus: 43 Minus: 45 Star: 42 Slash: 47
-  Open: 40 Close: 41
+  identifier digit
+  bad eof none
+  plus: 43 minus: 45 star: 42 slash: 47
+  open: 40 close: 41
 }
 
 func TextPos(start: i32, end: i32): TextPos {
@@ -22,11 +22,11 @@ func Token(kind: TokenKind, pos: TextPos): Token {
 }
 
 func TokenEOF(pos: TextPos): Token {
-  return Token(TokenKind.EOF, pos)
+  return Token(TokenKind.eof, pos)
 }
 
 func TokenBAD(pos: TextPos): Token {
-  return Token(TokenKind.BAD, pos)
+  return Token(TokenKind.bad, pos)
 }
 
 func `-`(left: TextPos, right: i32): TextPos {
@@ -35,15 +35,16 @@ func `-`(left: TextPos, right: i32): TextPos {
 
 func (self: TokenKind) to_str(): str {
   return
-    if   self == TokenKind.Identifier { "Identifier" }
-    elif self == TokenKind.Digit      { "Digit"      }
-    elif self == TokenKind.BAD        { "BAD"        }
-    elif self == TokenKind.EOF        { "EOF"        }
-    elif self == TokenKind.Plus       { "Plus"       }
-    elif self == TokenKind.Minus      { "Minus"      }
-    elif self == TokenKind.Star       { "Star"       }
-    elif self == TokenKind.Slash      { "Slash"      }
-    elif self == TokenKind.Open       { "Open"       }
-    elif self == TokenKind.Close      { "Close"      }
+    if   self == TokenKind.identifier { "Identifier" }
+    elif self == TokenKind.digit      { "Digit"      }
+    elif self == TokenKind.bad        { "BAD"        }
+    elif self == TokenKind.eof        { "EOF"        }
+    elif self == TokenKind.plus       { "Plus"       }
+    elif self == TokenKind.minus      { "Minus"      }
+    elif self == TokenKind.star       { "Star"       }
+    elif self == TokenKind.slash      { "Slash"      }
+    elif self == TokenKind.open       { "Open"       }
+    elif self == TokenKind.close      { "Close"      }
+    elif self == TokenKind.none       { "None"      }
     else                              { "UnknownTok" }
 }

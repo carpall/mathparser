@@ -10,29 +10,29 @@ func Lexer(src: str, len: i32): Lexer {
 
 // implementation
 
-func (self: chr) is_allowed_symbol(): u1 {
+func (self: chr) is_allowed_symbol(): bool {
   return
     self == '+' | self == '-' | self == '*' | self == '/' |
     self == '(' | self == ')'
 }
 
-func (self: chr) is_upper(): u1 {
+func (self: chr) is_upper(): bool {
   return (self as u8) >= ('A' as u8) & (self as u8) <= ('Z' as u8)
 }
 
-func (self: chr) is_lower(): u1 {
+func (self: chr) is_lower(): bool {
   return (self as u8) >= ('a' as u8) & (self as u8) <= ('z' as u8)
 }
 
-func (self: chr) is_ident_char(): u1 {
+func (self: chr) is_ident_char(): bool {
   return self.is_lower() | self.is_upper() | self == '_'
 }
 
-func (self: chr) is_num_char(): u1 {
+func (self: chr) is_num_char(): bool {
   return (self as u8) >= ('0' as u8) & (self as u8) <= ('9' as u8)
 }
 
-func (self: chr) is_ident_num_char(): u1 {
+func (self: chr) is_ident_num_char(): bool {
   return self.is_ident_char() | self.is_num_char()
 }
 
@@ -44,11 +44,11 @@ func (self: chr) recognize_symbol(): TokenKind {
   return (self as u8) as TokenKind
 }
 
-func (self: chr) is_control(): u1 {
+func (self: chr) is_control(): bool {
   return self == ' ' | self == '\r' | self == '\t'
 }
 
-func (this: *Lexer) reached_eof(): u1 {
+func (this: *Lexer) reached_eof(): bool {
   return (*this).idx >= (*this).len
 }
 
@@ -80,7 +80,7 @@ func (this: *Lexer) collect_ident(): Token {
 
   const end = (*this).idx
 
-  return Token(TokenKind.Identifier, this.take_ident(start, end), TextPos(start, end))
+  return Token(TokenKind.identifier, this.take_ident(start, end), TextPos(start, end))
 }
 
 func (this: *Lexer) collect_num(): Token {
@@ -93,7 +93,7 @@ func (this: *Lexer) collect_num(): Token {
   
   const end = (*this).idx
 
-  return Token(TokenKind.Digit, this.take_ident(start, end), TextPos(start, end))
+  return Token(TokenKind.digit, this.take_ident(start, end), TextPos(start, end))
 }
 
 func (this: *Lexer) collect_symbol(): Token {

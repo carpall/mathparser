@@ -1,1 +1,8 @@
-type Node = ( BinaryNode | Token )
+type Node = ( *BinaryNode | Token | BadNode )
+
+// need at least one field
+type BadNode { a: bool }
+
+func Node(): Node {
+	return new BadNode { } as Node
+}

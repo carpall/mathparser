@@ -2,15 +2,24 @@ func print_errors(errors: DiagnosticBag) {
   puts("parse: fail")
 
   for i: i32, i < errors.len, i++ {
-    puts(errors)
+    puts(errors[i].to_str())
   }
 }
 
-func main() {
+// tofix
+func (self: Node) walk_ast_and_dealloc() {
+  if self is *BinaryNode bin { bin.free<BinaryNode>() }
+}
+
+func main(): u8 {
+  // todo: fix parser recognized as enum
   const test = "1 + 2"
   const len = strlen(test) as i32
   var parser = Parser(test, len)
-  (&parser).parse() catch { print_errors(parser.bag) return }
+  const ast = (&parser).parse() catch e { print_errors(parser.bag) return e as u8 }
   
+  // ast.walk_ast_and_dealloc()
   puts("parse: ok")
+  puts(unbox<Token>((*unbox<*BinaryNode>(ast)).left).value)
+  return 0
 }

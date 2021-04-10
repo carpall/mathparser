@@ -6,3 +6,7 @@ type SyntaxError {
 func SyntaxError(msg: str, pos: TextPos): SyntaxError {
 	return new SyntaxError { msg: msg, pos: pos }
 }
+
+func (self: SyntaxError) to_str(): str {
+	return "SyntaxError: " + self.msg
+}
