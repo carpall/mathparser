@@ -1,1 +1,0 @@
-enum ParseErr: err { CouldNotParse: 1 }
