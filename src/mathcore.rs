@@ -11,5 +11,6 @@ pub use evaluator::Evaluator;
 pub use error::Error;
 pub use ast::*;
 pub use token::Token;
+pub use token::TokenKind;
 
 pub type Position = std::ops::Range<usize>;

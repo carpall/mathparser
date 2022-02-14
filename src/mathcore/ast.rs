@@ -1,6 +1,7 @@
 use crate::mathcore;
 use mathcore::Position;
 use mathcore::Token;
+use mathcore::TokenKind;
 
 #[derive(Clone)]
 pub enum BinaryOperator {
@@ -25,11 +26,13 @@ pub enum Node {
 
 impl BinaryOperator {
   pub fn from_token(token: Token) -> Self {
-    match token {
-      Token::Plus(position) => Self::Plus(position),
-      Token::Minus(position) => Self::Minus(position),
-      Token::Star(position) => Self::Star(position),
-      Token::Slash(position) => Self::Slash(position),
+    let position = token.get_position();
+
+    match token.get_kind() {
+      TokenKind::Plus => Self::Plus(position),
+      TokenKind::Minus => Self::Minus(position),
+      TokenKind::Star => Self::Star(position),
+      TokenKind::Slash => Self::Slash(position),
       _ => unreachable!()
     }
   }
@@ -47,9 +50,11 @@ impl BinaryOperator {
 
 impl UnaryOperator {
   pub fn from_token(token: Token) -> Self {
-    match token {
-      Token::Plus(position) => Self::Plus(position),
-      Token::Minus(position) => Self::Minus(position),
+    let position = token.get_position();
+
+    match token.get_kind() {
+      TokenKind::Plus => Self::Plus(position),
+      TokenKind::Minus => Self::Minus(position),
       _ => unreachable!()
     }
   }

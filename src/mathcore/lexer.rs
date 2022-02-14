@@ -1,5 +1,6 @@
 use crate::mathcore;
 use mathcore::Token;
+use mathcore::TokenKind;
 use mathcore::Position;
 
 #[derive(Clone)]
@@ -12,22 +13,23 @@ pub struct Lexer {
 
 impl Lexer {
   pub fn from(expression: String) -> Self {
+    let default = Token::from(TokenKind::Bad, String::new(), 0..0);
+
     let mut lexer = Self {
       expression: expression,
       index: 0,
-      back: Token::Bad(0..0),
-      head: Token::Bad(0..0)
+      back: default.clone(),
+      head: default
     };
 
     lexer.consume();
-
     lexer
   }
 
   #[allow(dead_code)]
-  pub fn back(self) -> Token { self.back }
+  pub fn back(&self) -> Token { self.back.clone() }
 
-  pub fn head(self) -> Token { self.head }
+  pub fn head(&self) -> Token { self.head.clone() }
 
   pub fn consume(&mut self) -> Token {
     self.back = self.head.clone();
@@ -39,39 +41,46 @@ impl Lexer {
   fn next(&mut self) -> Token {
     self.eat_whitespace();
 
-    if self.reached_eof() { return Token::Eof(self.get_eof_position()); }
+    if self.reached_eof() { return Token::from(TokenKind::Eof, String::new(), self.get_eof_position()); }
 
     let token =
       if self.cur().is_ascii_digit() {
         self.collect_number()
       } else {
-        match self.cur() {
-          '+' => Token::Plus(self.cur_pos()),
-          '-' => Token::Minus(self.cur_pos()),
-          '*' => Token::Star(self.cur_pos()),
-          '/' => Token::Slash(self.cur_pos()),
-          '(' => Token::LeftPar(self.cur_pos()),
-          ')' => Token::RightPar(self.cur_pos()),
-          _ => self.collect_group_of_bad_characters()
+        let cur = self.cur();
+        let kind = match cur {
+          '+' => TokenKind::Plus,
+          '-' => TokenKind::Minus,
+          '*' => TokenKind::Star,
+          '/' => TokenKind::Slash,
+          '(' => TokenKind::LeftPar,
+          ')' => TokenKind::RightPar,
+          _ => TokenKind::Bad
+        };
+
+        if kind == TokenKind::Bad {
+          self.collect_group_of_bad_characters()
+        } else {
+          Token::from(kind, String::from(cur), self.cur_pos())
         }
       };
 
-    // dbg!(token.clone());
     self.index += 1;
     token
   }
 
   fn collect_group_of_bad_characters(&mut self) -> Token {
     let start = self.cur_pos();
+    let old_index = self.index;
 
-    if !self.cur().is_alphanumeric() { return Token::Bad(start); }
+    if !self.cur().is_alphanumeric() { return Token::from(TokenKind::Bad, String::from(self.cur()), start); }
 
     while !self.reached_eof() && self.cur().is_alphanumeric() {
       self.index += 1;
     }
 
     self.index -= 1;
-    Token::Bad(start.start..self.cur_pos().end)
+    Token::from(TokenKind::Bad, self.expression.chars().skip(old_index).take(self.index).collect(), start.start..self.cur_pos().end)
   }
 
   fn collect_number(&mut self) -> Token {
@@ -84,7 +93,7 @@ impl Lexer {
     }
 
     self.index -= 1;
-    Token::Number(number.parse::<f64>().unwrap(), start.start..self.cur_pos().end)
+    Token::from(TokenKind::Number, number, start.start..self.cur_pos().end)
   }
 
   fn cur(&self) -> char { self.expression.chars().nth(self.index).unwrap() }
