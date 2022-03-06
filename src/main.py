@@ -14,8 +14,11 @@ try:
     if (expr := input('> ')) == '': continue
 
     try:
-      print(f'{Evaluator(expr).evaluate():g}')
+      evaluated = Evaluator(expr).evaluate()
+      result = str(evaluated).replace('.0', '')
+
+      print(result)
     except EvaluatorException as e:
       print_error(e)
 except KeyboardInterrupt:
-  print()
+  print('')

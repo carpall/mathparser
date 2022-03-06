@@ -3,3 +3,6 @@ class Token:
     self.kind = kind
     self.value = value
     self.pos = pos
+  
+  def __str__(self):
+    return f'<token @ {self.kind.__repr__()} | {self.value.__repr__()}>'

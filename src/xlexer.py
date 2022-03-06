@@ -1,6 +1,7 @@
-from xtoken import *
+from utilities import EvaluatorException
+from xtoken    import *
 
-TOKENS = ['+', '-', '*', '/', '(', ')', 'num', 'eof', 'bad']
+TOKENS = ['+', '-', '*', '/', '(', ')', ',', 'num', 'id', 'eof', 'bad']
 WHITESPACE = [' ', '\t', '\n']
 
 class Lexer:
@@ -26,46 +27,40 @@ class Lexer:
     if self.reached_eof():
       return Token('eof', '', self.eof_pos())
     
-    if self.cur().isdigit():
+    cur = self.cur()
+
+    if cur.isdigit():
       token = self.collect_number()
+    elif cur.isalpha():
+      token = self.collect_identifier()
     else:
-      cur = self.cur()
       kind = cur if cur in TOKENS else 'bad'
-      token = self.collect_group_of_bad_characters() if kind == 'bad' else Token(kind, cur, self.cur_pos())
+      token = Token(kind, cur, self.cur_pos())
 
     self.index += 1
     return token
 
-  def collect_group_of_bad_characters(self):
+  def collect_pattern(self, kind, pattern_matcher):
     start = self.cur_pos()
-    old_index = self.index
+    pattern = ''
 
-    if not self.cur().isalnum():
-      return Token('bad', self.cur(), start)
-
-    while not self.reached_eof() and self.cur().isalnum():
+    while not self.reached_eof() and pattern_matcher(cur := self.cur()):
+      pattern += cur
       self.index += 1
 
     self.index -= 1
-    return Token('bad', self.expr[old_index:self.index], range(start.start, self.cur_pos().stop))
+    return Token(kind, pattern, range(start.start, self.cur_pos().stop))
+
+  def collect_identifier(self):
+    return self.collect_pattern('id', lambda cur: cur.isalnum())
 
   def collect_number(self):
-    start = self.cur_pos()
-    number = ''
-    reached_dot = False
+    first_part = self.collect_pattern('num', lambda cur: cur.isdigit() or cur == '.')
 
-    while not self.reached_eof() and ((cur := self.cur()).isdigit() or cur == '.'):
-      if cur == '.':
-        if reached_dot:
-          break
-
-        reached_dot = True
-
-      number += cur
-      self.index += 1
-
-    self.index -= 1
-    return Token('num', number, range(start.start, self.cur_pos().stop))
+    if first_part.value.count('.') > 1:
+      raise EvaluatorException('invalid number', first_part.pos)
+    
+    return first_part
 
   def cur(self):
     return self.expr[self.index]
