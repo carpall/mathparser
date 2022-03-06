@@ -3,8 +3,17 @@ from utilities  import EvaluatorException
 from xparser    import *
 from math       import sqrt, log, log10, sin, cos, tan, nan, inf
 
+def fib(n):
+  a, b = 0, 1
+
+  for _ in range(n):
+    a, b = b, a + b
+  
+  return a
+
 PI = 3.14159265359
 E = 2.718281828459045
+PHI = 1.61803399
 
 BUILTIN_FN = {
   'sqrt':  lambda x: sqrt(x),
@@ -15,11 +24,13 @@ BUILTIN_FN = {
   'sin':   lambda x: sin(x),
   'cos':   lambda x: cos(x),
   'tan':   lambda x: tan(x),
+  'fib':   lambda x: fib(int(x))
 }
 
 BUILTIN_VAR = {
   'pi':  PI,
   'e':   E,
+  'phi': PHI,
   'nan': nan,
   'inf': inf
 }
