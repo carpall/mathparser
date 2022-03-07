@@ -74,10 +74,7 @@ class Parser:
     pos = self.lexer.consume().pos
     expr = self.expect_expression()
 
-    if name.kind != 'var':
-      raise EvaluatorException('assigning to expression', name.pos)
-
-    return AssignNode(name.name, expr, pos)
+    return AssignNode(name, expr, pos)
 
   def parse_equation(self, left):
     # eating '='
