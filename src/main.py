@@ -10,12 +10,16 @@ def print_error(error):
   print(f' {error.msg}', file=stderr)
 
 try:
+  evaluator = Evaluator()
   while True:
     if (expr := input('> ')) == '': continue
 
     try:
-      evaluated = Evaluator(expr).evaluate()
+      evaluated = evaluator.evaluate(expr)
       result = str(evaluated).replace('.0', '')
+
+      if evaluated == None:
+        continue
 
       print(result)
     except EvaluatorException as e:

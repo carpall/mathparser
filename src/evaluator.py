@@ -1,7 +1,7 @@
 from operator   import add, sub, mul, truediv as div
 from utilities  import EvaluatorException
 from xparser    import *
-from math       import sqrt, log, log10, sin, cos, tan, nan, inf
+from math       import sqrt, log, log10, sin, cos, tan, nan, inf, tau
 
 def fib(n):
   a, b = 0, 1
@@ -24,7 +24,9 @@ BUILTIN_FN = {
   'sin':   lambda x: sin(x),
   'cos':   lambda x: cos(x),
   'tan':   lambda x: tan(x),
-  'fib':   lambda x: fib(int(x))
+  'fib':   lambda x: fib(int(x)),
+  'min':   lambda x, y: min(x, y),
+  'max':   lambda x, y: max(x, y),
 }
 
 BUILTIN_VAR = {
@@ -32,12 +34,13 @@ BUILTIN_VAR = {
   'e':   E,
   'phi': PHI,
   'nan': nan,
-  'inf': inf
+  'inf': inf,
+  'tau': tau
 }
 
 class Evaluator:
-  def __init__(self, expr):
-    self.parser = Parser(expr)
+  def __init__(self):
+    self.vars = {}
 
   def eval_bin(self, node):
     op_call = {
@@ -45,6 +48,7 @@ class Evaluator:
       '-': sub,
       '*': mul,
       '/': div,
+      '^': pow,
     }[node.op.kind]
 
     try:
@@ -60,11 +64,32 @@ class Evaluator:
   def eval_num(self, node):
     return node.value
 
+  def eval_assign(self, node):
+    self.vars[node.name] = self.eval_node(node.expr)
+
+  def eval_eq(self, node):
+    l = self.eval_node(node.left)
+    r = self.eval_node(node.right)
+
+    op = {
+      '=':  lambda x, y: x == y,
+      '!=': lambda x, y: x != y,
+      '<':  lambda x, y: x < y,
+      '>':  lambda x, y: x > y,
+      '<=': lambda x, y: x <= y,
+      '>=': lambda x, y: x >= y,
+    }[node.op]
+
+    return 'imp' if not op(l, r) else None
+
   def eval_var(self, node):
     try:
       return BUILTIN_VAR[node.name]
     except KeyError:
-      raise EvaluatorException(f'unknown variable', node.pos)
+      try:
+        return self.vars[node.name]
+      except KeyError:
+        raise EvaluatorException(f'unknown variable', node.pos)
 
   def eval_call(self, node):
     try:
@@ -78,5 +103,6 @@ class Evaluator:
   def eval_node(self, node):
     return getattr(Evaluator, f'eval_{node.kind}')(self, node)
 
-  def evaluate(self):
+  def evaluate(self, expr):
+    self.parser = Parser(expr)
     return self.eval_node(self.parser.parse())

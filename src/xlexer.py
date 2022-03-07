@@ -1,7 +1,8 @@
 from utilities import EvaluatorException
 from xtoken    import *
 
-TOKENS = ['+', '-', '*', '/', '(', ')', ',', 'num', 'id', 'eof', 'bad']
+DOUBLE_TOKENS = ['<-', '<=', '>=', '!=']
+TOKENS = ['+', '-', '*', '/', '^', '(', ')', ',', '=', '<', '>', 'num', 'id', 'eof', 'bad']
 WHITESPACE = [' ', '\t', '\n']
 
 class Lexer:
@@ -21,6 +22,14 @@ class Lexer:
 
     return self.back
 
+  def could_be_double(self):
+    for e in DOUBLE_TOKENS:
+      if e.startswith(self.cur()):
+        try:
+          return e == self.cur() + self.expr[self.index + 1]
+        except IndexError:
+          return False
+
   def next(self):
     self.eat_whitespace()
 
@@ -33,6 +42,11 @@ class Lexer:
       token = self.collect_number()
     elif cur.isalpha():
       token = self.collect_identifier()
+    elif self.could_be_double():
+      first_part_pos = self.cur_pos()
+      self.index += 1 # skip the first part of the double token
+      kind = cur + self.cur() # here self.cur() is the second part of the double token
+      token = Token(kind, kind, range(first_part_pos.start, self.cur_pos().stop))
     else:
       kind = cur if cur in TOKENS else 'bad'
       token = Token(kind, cur, self.cur_pos())
